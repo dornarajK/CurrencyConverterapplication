@@ -1,4 +1,4 @@
-package org.example.LayoutsbuildingtheUI_6_2.Model;
+package org.example.Model;
 
 public class Currency {
     private String abbreviation;

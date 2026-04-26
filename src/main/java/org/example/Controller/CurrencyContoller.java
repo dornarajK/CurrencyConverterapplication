@@ -1,19 +1,22 @@
-package org.example.LayoutsbuildingtheUI_6_2.Controller;
+package org.example.Controller;
 
-import org.example.LayoutsbuildingtheUI_6_2.Model.Currency;
-import org.example.LayoutsbuildingtheUI_6_2.Model.CurrencyList;
 
+
+import org.example.Model.Currency;
+import org.example.Model.CurrencyList;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class CurrencyContoller {
     private CurrencyList model;
 
-    public CurrencyContoller () {
+    public CurrencyContoller() {
             model = new CurrencyList();
     }
 
 
-    public List<Currency> getCurrencies() {
+    public ArrayList<Currency> getCurrencies() {
         return model.getCurrencies();
     }
 

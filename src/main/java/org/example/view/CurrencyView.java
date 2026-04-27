@@ -1,4 +1,4 @@
-package org.example.View;
+package org.example.view;
 
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -6,14 +6,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.example.Controller.CurrencyContoller;
-import org.example.Model.Currency;
+import org.example.controller.CurrencyContoller;
+import org.example.entity.Currency;
 
 import java.util.List;
 import java.util.Objects;
 
 public class CurrencyView {
-
     private CurrencyContoller controller;
 
     public void init() {
@@ -22,6 +21,20 @@ public class CurrencyView {
 
     public void start(Stage stage) {
         System.out.println("VIEW STARTED");
+        List<Currency> currencies = controller.getCurrencies();
+
+        if (currencies == null || currencies.isEmpty()) {
+            // Show error and exit gracefully
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Database error");
+            alert.setHeaderText("Cannot load currency data");
+            alert.setContentText("Please check your database connection.\nMake sure MariaDB is running and the 'currencydb' exists with a 'currencies' table.");
+            alert.showAndWait();
+            stage.close();
+
+            return;
+        }
 
         // Input amount
         Label amountLabel = new Label("Amount: ");
@@ -34,30 +47,21 @@ public class CurrencyView {
             }
         });
 
-        // Currency dropdowns
-        Label fromCurrencyLabel = new Label("From: ");
-        ComboBox<String> fromCurrencyComboBox = new ComboBox<>();
 
-        Label toLabel = new Label("To: ");
-        ComboBox<String> toCurrencyComboBox = new ComboBox<>();
-
-        // Load currencies from controller
-        List<Currency> list = controller.getCurrencies();
-        System.out.println(list);
-        for (Currency c : list) {
+        ComboBox<String> fromCombo = new ComboBox<>();
+        ComboBox<String> toCombo = new ComboBox<>();
+        for (Currency c : currencies) {
             String code = c.getAbbreviation();
-            fromCurrencyComboBox.getItems().add(code);
-            toCurrencyComboBox.getItems().add(code);
+            fromCombo.getItems().add(code);
+            toCombo.getItems().add(code);
         }
-
         // Set default selections
-        if (!list.isEmpty()) {
-            fromCurrencyComboBox.setValue(list.get(0).getAbbreviation());
-            if (list.size() > 1) {
-                toCurrencyComboBox.setValue(list.get(1).getAbbreviation());
-            } else {
-                toCurrencyComboBox.setValue(list.get(0).getAbbreviation());
-            }
+        if (!currencies.isEmpty()) {
+            fromCombo.setValue(currencies.get(0).getAbbreviation());
+            if (currencies.size() > 1)
+                toCombo.setValue(currencies.get(1).getAbbreviation());
+            else
+                toCombo.setValue(currencies.get(0).getAbbreviation());
         }
 
         // Result field (read‑only)
@@ -69,16 +73,29 @@ public class CurrencyView {
         Button convertButton = new Button("Convert");
         convertButton.setOnAction(e -> {
             String amount = amountField.getText();
-            String from = fromCurrencyComboBox.getValue();
-            String to = toCurrencyComboBox.getValue();
+            String from = fromCombo.getValue();
+            String to = toCombo.getValue();
 
             String result = controller.Convert(amount, from, to);
-            resultField.setText(result);
+
+            if (result == null) {
+                // Database error during conversion
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Database error");
+                alert.setHeaderText("Could not fetch exchange rate");
+                alert.setContentText("Please check your database connection and try again.");
+                alert.showAndWait();
+                resultField.clear();
+            } else {
+                resultField.setText(result);
+            }
         });
 
+
+
         // Layout
-        VBox formBox = new VBox(fromCurrencyComboBox);
-        VBox toBox = new VBox(toCurrencyComboBox);
+        VBox formBox = new VBox(fromCombo);
+        VBox toBox = new VBox(toCombo);
         HBox selectionBox = new HBox(10, formBox, toBox);
         HBox resultBox = new HBox(resultField);
 

@@ -2,9 +2,10 @@ package org.example;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import org.example.View.CurrencyView;
+import org.example.view.CurrencyView;
 
 public class Main extends Application {
+    // mvn javafx:run
 
     @Override
     public void start(Stage stage) {

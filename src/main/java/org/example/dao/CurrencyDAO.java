@@ -18,10 +18,13 @@ public class CurrencyDAO {
     public double getExchangeRate(String abbreviation) {
         try (EntityManager em = JPAUtil.getEntityManager()) {
             Currency c = em.find(Currency.class, abbreviation);
-            if (c == null) {
-                throw new RuntimeException("Currency not found: " + abbreviation);
-            }
+            if (c == null) throw new RuntimeException("Currency not found");
             return c.getExchangeRateToUSD();
+        }
+    }
+    public Currency findByAbbreviation(String abbreviation) {
+        try (EntityManager em = JPAUtil.getEntityManager()) {
+            return em.find(Currency.class, abbreviation);
         }
     }
 

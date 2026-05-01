@@ -1,6 +1,7 @@
 package org.example.entity;
 
 import jakarta.persistence.*;
+import org.example.datasource.JPAUtil;
 
 @Entity
 @Table(name = "currency")
@@ -21,7 +22,11 @@ public class Currency {
         this.name = name;
         this.exchangeRateToUSD = exchangeRateToUSD;
     }
-
+    public Currency findByAbbreviation(String abbreviation) {
+        try (EntityManager em = JPAUtil.getEntityManager()) {
+            return em.find(Currency.class, abbreviation);
+        }
+    }
 
     public String getAbbreviation() { return abbreviation; }
     public void setAbbreviation(String abbreviation) { this.abbreviation = abbreviation; }
